@@ -12,12 +12,13 @@ module.exports = function (grunt) {
 
     var jsonServer = require('json-server'),
         request  = require('superagent'),
-        path = require('path');
+        path = require('path'),
+        enableDestroy = require('server-destroy')
 
     // Please see the Grunt documentation for more information regarding task
     // creation: http://gruntjs.com/creating-tasks
 
-    grunt.registerMultiTask('json_server', 'Give it a JSON or JS seed file and it will serve it through REST routes.', function () {
+    grunt.registerTask('json_server', 'Give it a JSON or JS seed file and it will serve it through REST routes.', function () {
         var done = this.async();
         // Merge task-specific and/or target-specific options with these defaults.
         var options = this.options({
@@ -40,6 +41,7 @@ module.exports = function (grunt) {
 
         // Start server
         function start(router,port) {
+            server && server.destroy();
             server.use(router); //Express router
             server
             .listen(port, options.hostname)
@@ -68,6 +70,7 @@ module.exports = function (grunt) {
                     grunt.fatal(err);
                 }
             });
+            enableDestroy(server);
         }
 
         grunt.log.write('Loading database from ' + source + '\n');
